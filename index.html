@@ -102,6 +102,36 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
+        /* Nuevos estilos para la sección de entrada */
+        .input-section {
+            margin: 20px 0;
+            background-color: rgba(255,255,255,0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .number-input {
+            padding: 10px;
+            font-size: 16px;
+            margin-right: 10px;
+            border: 1px solid #81c784;
+            border-radius: 5px;
+            width: 100px;
+        }
+        .mark-button {
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .mark-button:hover {
+            background-color: #1b5e20;
+            transform: translateY(-1px);
+        }
     </style>
 </head>
 <body>
@@ -135,37 +165,81 @@
         Juego el día 28 de febrero con los 2 últimos números de la lotería Medellín
         <div class="price-info">Valor de la rifa: $10.000</div>
     </div>
-    <div class="numbers-grid" id="numbersGrid">
-    </div>
+
+    <!-- Nueva sección de entrada -->
+    <!-- <div class="input-section">
+        <input type="number" id="numberInput" class="number-input" min="0" max="99" placeholder="Número (0-99)">
+        <button class="mark-button" id="markButton">Marcar Número</button>
+    </div> -->
+
+    <div class="numbers-grid" id="numbersGrid"></div>
     
-    <button class="reset-button" id="resetButton">Resetear Números</button>
+    <!-- <button class="reset-button" id="resetButton">Resetear Números</button> -->
 
     <script>
-        // Crear los números dinámicamente
-        const grid = document.getElementById('numbersGrid');
+        // Sistema de almacenamiento permanente
+        const STORAGE_KEY = 'rifaNumbers';
         
-        for (let i = 0; i <= 99; i++) {
-            const number = document.createElement('div');
-            number.className = 'number';
-            const formattedNumber = i.toString().padStart(2, '0');
-            number.innerHTML = `<span class="digit">${formattedNumber}</span>`;
-            
-            // Agregar funcionalidad de clic
-            number.addEventListener('click', function() {
-                this.classList.toggle('purchased');
-            });
-            
-            grid.appendChild(number);
+        // Función para guardar números en localStorage
+        function saveNumbers(numbers) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(numbers)));
         }
 
-        // Funcionalidad del botón de reset
-        const resetButton = document.getElementById('resetButton');
-        resetButton.addEventListener('click', function() {
-            const purchasedNumbers = document.querySelectorAll('.number.purchased');
-            purchasedNumbers.forEach(number => {
-                number.classList.remove('purchased');
-            });
-        });
+        // Función para cargar números desde localStorage
+        function loadNumbers() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            return saved ? new Set(JSON.parse(saved)) : new Set();
+        }
+
+        // Estado global
+        let purchasedNumbers = loadNumbers();
+
+        // Función para actualizar la cuadrícula
+        function updateGrid() {
+            const grid = document.getElementById('numbersGrid');
+            grid.innerHTML = ''; // Limpiar la cuadrícula
+
+            for (let i = 0; i <= 99; i++) {
+                const number = document.createElement('div');
+                number.className = 'number';
+                const formattedNumber = i.toString().padStart(2, '0');
+                number.innerHTML = `<span class="digit">${formattedNumber}</span>`;
+                
+                // Marcar números comprados
+                if (purchasedNumbers.has(i)) {
+                    number.classList.add('purchased');
+                }
+                
+                // Agregar evento de clic
+                number.addEventListener('click', function() {
+                    if (number.classList.contains('purchased')) {
+                        purchasedNumbers.delete(i);
+                    } else {
+                        purchasedNumbers.add(i);
+                    }
+                    number.classList.toggle('purchased');
+                    saveNumbers(purchasedNumbers);
+                });
+                
+                grid.appendChild(number);
+            }
+        }
+
+        // Inicializar la cuadrícula
+        updateGrid();
+
+        // Configurar el botón de marcar
+        const markButton = document.getElementById('markButton');
+        const numberInput = document.getElementById('numberInput');
+
+        //numeros apartados
+        purchasedNumbers.add(75);
+        purchasedNumbers.add(29);
+        purchasedNumbers.add(7);
+        purchasedNumbers.add(35);
+        saveNumbers(purchasedNumbers);
+        updateGrid();
+
     </script>
 </body>
 </html>
