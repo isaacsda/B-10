@@ -2,329 +2,371 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Gran Rifa</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adivina el Alien</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
+            font-family: 'Orbitron', Arial, sans-serif;
+            color: #fff;
             padding: 20px;
-            text-align: center;
-            background-color: #e8f5e9;
-            position: relative;
-            overflow-x: hidden;
+            background-color: #000;
+            background-image: radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px),
+                radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 40px),
+                radial-gradient(rgba(255,255,255,.4), rgba(255,255,255,.1) 2px, transparent 30px);
+            background-size: 550px 550px, 350px 350px, 250px 250px, 150px 150px;
+            background-position: 0 0, 40px 60px, 130px 270px, 70px 100px;
+            animation: twinkle 10s infinite linear;
         }
-        .background-decoration {
-            position: fixed;
+        
+        @keyframes twinkle {
+            0% { background-position: 0 0, 40px 60px, 130px 270px, 70px 100px; }
+            100% { background-position: 550px 550px, 390px 410px, 380px 520px, 220px 250px; }
+        }
+        
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .image-container {
+            width: 200px;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .image-container:hover {
+            transform: translateY(-5px);
+        }
+        
+        .image-container img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 2px solid #4CAF50;
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+        }
+        
+        .image-name {
+            margin-top: 8px;
+            font-size: 14px;
+            color: #4CAF50;
+            text-shadow: 0 0 5px rgba(76, 175, 80, 0.7);
+        }
+        
+        .alien-power {
+            font-size: 12px;
+            color: #8bc34a;
+            opacity: 0.8;
+        }
+        
+        .selected::before {
+            content: '';
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
-            z-index: -1;
+            height: 150px;
+            background-color: rgba(255, 0, 0, 0.5);
+            border-radius: 8px;
             pointer-events: none;
         }
-        h1 {
-            color: #2e7d32;
-            font-size: 48px;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        }
-        .subtitle {
-            font-size: 24px;
-            color: #1b5e20;
-            margin-bottom: 40px;
-            background-color: rgba(255,255,255,0.8);
-            padding: 10px;
-            border-radius: 10px;
-        }
-        .price-info {
-            font-size: 22px;
-            color: #d32f2f;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-        .numbers-grid {
-            display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            gap: 10px;
-            margin-top: 30px;
-            margin-bottom: 30px;
-            background-color: rgba(255,255,255,0.9);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .number {
-            border: 1px solid #81c784;
-            padding: 10px;
-            font-size: 20px;
-            background-color: #ffffff;
-            cursor: pointer;
-            position: relative;
-            transition: all 0.3s ease;
-            border-radius: 5px;
-        }
-        .number:hover {
-            background-color: #c8e6c9;
-        }
-        .number.purchased {
-            background-color: #ffebee;
-            color: #d32f2f;
-        }
-        .number.purchased::after {
-            content: "X";
+        
+        .selected::after {
+            content: 'X';
             position: absolute;
-            top: 50%;
+            top: 75px;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 24px;
-            color: #d32f2f;
+            font-size: 80px;
+            color: white;
             font-weight: bold;
+            pointer-events: none;
+            z-index: 10;
         }
-        .number.purchased .digit {
-            opacity: 0.3;
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #4CAF50;
+            font-size: 36px;
+            text-shadow: 0 0 10px rgba(76, 175, 80, 0.8), 0 0 20px rgba(76, 175, 80, 0.5);
+            letter-spacing: 2px;
         }
-        .reset-button {
-            background-color: #d32f2f;
-            color: white;
-            border: none;
-            padding: 15px 30px;
+        
+        .counter {
+            text-align: center;
+            margin-bottom: 20px;
             font-size: 18px;
-            border-radius: 25px;
-            cursor: pointer;
-            margin: 20px auto;
-            display: block;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            color: #4CAF50;
         }
-        .reset-button:hover {
-            background-color: #b71c1c;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        
+        .season-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
         }
-        /* Nuevos estilos para la sección de entrada */
-        .input-section {
-            margin: 20px 0;
-            background-color: rgba(255,255,255,0.9);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .number-input {
-            padding: 10px;
-            font-size: 16px;
-            margin-right: 10px;
-            border: 1px solid #81c784;
-            border-radius: 5px;
-            width: 100px;
-        }
-        .mark-button {
-            background-color: #2e7d32;
-            color: white;
-            border: none;
+        
+        .season-button {
+            background-color: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+            border: 2px solid #4CAF50;
+            border-radius: 30px;
             padding: 10px 20px;
             font-size: 16px;
-            border-radius: 5px;
             cursor: pointer;
             transition: all 0.3s ease;
+            font-family: 'Orbitron', Arial, sans-serif;
+            text-shadow: 0 0 5px rgba(76, 175, 80, 0.7);
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
         }
-        .mark-button:hover {
-            background-color: #1b5e20;
-            transform: translateY(-1px);
+        
+        .season-button:hover {
+            background-color: rgba(76, 175, 80, 0.4);
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.8);
+            transform: translateY(-3px);
+        }
+        
+        @font-face {
+            font-family: 'Orbitron';
+            src: url('https://cdnjs.cloudflare.com/ajax/libs/font-face/1.0.0/fonts/Orbitron/Orbitron-Regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
         }
     </style>
 </head>
 <body>
-    <svg class="background-decoration" viewBox="0 0 1000 600">
-        <!-- Cielo -->
-        <rect width="100%" height="100%" fill="#87CEEB"/>
-        
-        <!-- Sol -->
-        <circle cx="100" cy="100" r="40" fill="#FFD700"/>
-        
-        <!-- Montañas de fondo -->
-        <path d="M0 300 L200 150 L400 280 L600 180 L800 250 L1000 200 L1000 600 L0 600 Z" fill="#4A6741"/>
-        
-        <!-- Montañas del frente -->
-        <path d="M-100 400 L200 250 L400 380 L600 280 L800 350 L1000 300 L1000 600 L-100 600 Z" fill="#2D5A27"/>
-        
-        <!-- Campo -->
-        <path d="M0 450 Q 250 430, 500 450 T 1000 450 L1000 600 L0 600 Z" fill="#90EE90"/>
-        
-        <!-- Flores esparcidas -->
-        <g>
-            <circle cx="150" cy="500" r="3" fill="#FF69B4"/>
-            <circle cx="350" cy="480" r="3" fill="#FFB6C1"/>
-            <circle cx="550" cy="520" r="3" fill="#FF69B4"/>
-            <circle cx="750" cy="490" r="3" fill="#FFB6C1"/>
-        </g>
-    </svg>
-
-    <h1>GRAN RIFA DE $500.000</h1>
-    <div class="subtitle">
-        <div>Juego el día 28 de febrero con los 2 últimos números de la lotería Medellín</div>
-        <div class="price-info">Valor de la rifa: $10.000</div>
-        <div class="price-info">Pagar al Nequi 3245928727</div>
+    <h1>ADIVINA EL ALIEN</h1>
+    <div class="counter" id="counter">Aliens encontrados: <span id="found">0</span> / <span id="total">69</span></div>
+    
+    <div class="season-buttons">
+        <button class="season-button" id="season1">Primera Temporada</button>
+        <button class="season-button" id="season2">Segunda Temporada</button>
+        <button class="season-button" id="season3">Tercera Temporada</button>
+        <button class="season-button" id="season4">Cuarta Temporada</button>
+        <button class="season-button" id="reset">Limpiar Todo</button>
+    </div>
+    
+    <div class="gallery" id="gallery">
+        <!-- Imágenes se generarán dinámicamente con JavaScript -->
     </div>
 
-    <!-- Nueva sección de entrada -->
-    <!-- <div class="input-section">
-        <input type="number" id="numberInput" class="number-input" min="0" max="99" placeholder="Número (0-99)">
-        <button class="mark-button" id="markButton">Marcar Número</button>
-    </div> -->
-
-    <div class="numbers-grid" id="numbersGrid"></div>
-    
-    <!-- <button class="reset-button" id="resetButton">Resetear Números</button> -->
-
     <script>
-        // Sistema de almacenamiento permanente
-        const STORAGE_KEY = 'rifaNumbers';
-        
-        // Función para guardar números en localStorage
-        function saveNumbers(numbers) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(numbers)));
-        }
-
-        // Función para cargar números desde localStorage
-        function loadNumbers() {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            return saved ? new Set(JSON.parse(saved)) : new Set();
-        }
-
-        // Estado global
-        let purchasedNumbers = loadNumbers();
-
-        // Función para actualizar la cuadrícula
-        function updateGrid() {
-            const grid = document.getElementById('numbersGrid');
-            grid.innerHTML = ''; // Limpiar la cuadrícula
-
-            for (let i = 0; i <= 99; i++) {
-                const number = document.createElement('div');
-                number.className = 'number';
-                const formattedNumber = i.toString().padStart(2, '0');
-                number.innerHTML = `<span class="digit">${formattedNumber}</span>`;
+        document.addEventListener('DOMContentLoaded', function() {
+            const gallery = document.getElementById('gallery');
+            const foundCounter = document.getElementById('found');
+            const totalCounter = document.getElementById('total');
+            let selectedCount = 0;
+            let containers = [];
+            
+            // Lista de aliens con sus poderes
+            const alienList = [
+                { name: "Heatblast", power: "Fuego" },
+                { name: "Wildmutt", power: "Bestia" },
+                { name: "Four Arms", power: "Cuatro Brazos" },
+                { name: "XLR8", power: "XLR8" },
+                { name: "Grey Matter", power: "Materia Gris" },
+                { name: "Stinkfly", power: "Insectoide" },
+                { name: "Ripjaws", power: "Acuático" },
+                { name: "Upgrade", power: "Ultra T" },
+                { name: "Ghostfreak", power: "Fantasmático" },
+                { name: "Diamondhead", power: "Diamante" },
+                { name: "Cannonbolt", power: "Cannonbolt" },
+                { name: "Wildvine", power: "Wildvine" },
+                { name: "Spitter", power: "Vomitón" },
+                { name: "Upchuck", power: "Glotón" },
+                { name: "Ditto", power: "Ditto" },
+                { name: "Eye Guy", power: "Multi Ojos" },
+                { name: "Way Big", power: "MUY grande" },
+                { name: "Benwolf", power: "Benlobo" },
+                { name: "Benmummy", power: "Benmomia" },
+                { name: "Benvicktor", power: "Benvíctor" },
+                { name: "Articguana", power: "Articguana" },
+                { name: "Buzzshock", power: "Electroshock" },
+                { name: "Swampfire", power: "Fuego Pantanoso" },
+                { name: "Echo Echo", power: "Echo Echo" },
+                { name: "Humungousaur", power: "Humungousaur" },
+                { name: "Jetray", power: "Jetray" },
+                { name: "Big Chill", power: "Frio" },
+                { name: "Chromastone", power: "piedra" },
+                { name: "Brainstorm", power: "Cerebrón" },
+                { name: "Spidermonkey", power: "Mon Araña" },
+                { name: "Goop", power: "Goop" },
+                { name: "Alien X", power: "Alien X" },
+                { name: "Lodestar", power: "Lodestar" },
+                { name: "Rath", power: "Rath" },
+                { name: "Nanomech", power: "Nanomech" },
+                { name: "Water Hazard", power: "Amenaza Acuática" },
+                { name: "AmpFibian", power: "Anfibio Eléctrico" },
+                { name: "Armodrillo", power: "Armadillo" },
+                { name: "Terraspin", power: "Tortutornado" },
+                { name: "NRG", power: "NRG" },
+                { name: "Fasttrack", power: "Fasttrack" },
+                { name: "ChamAlien", power: "Camaleón" },
+                { name: "Eatle", power: "Mandíbula" },
+                { name: "Clockwork", power: "Clockwork" },
+                { name: "Feedback", power: "Feedback" },
+                { name: "Bloxx", power: "Bloxx" },
+                { name: "Gravattack", power: "Gravattack" },
+                { name: "Crashhopper", power: "Saltamontes" },
+                { name: "Ball Weevil", power: "Escarabola" },
+                { name: "Walkatrout", power: "Pez Resbaladizo" },
+                { name: "Pesky Dust", power: "Polvo de Pesadilla" },
+                { name: "Mole-Stache", power: "Topo Bigotes" },
+                { name: "The Worst", power: "El Peor" },
+                { name: "Kickin Hawk", power: "Halcón Patada" },
+                { name: "Toepick", power: "Dedo del Terror" },
+                { name: "Astrodactyl", power: "Astrodáctilo" },
+                { name: "Bullfrag", power: "Rana Toro" },
+                { name: "Atomix", power: "Atomix" },
+                { name: "Gutrot", power: "Gas Tóxico" },
+                { name: "Whampire", power: "Vampiro" },
+                { name: "Overflow", power: "Desbordamiento" },
+                { name: "Shock Rock", power: "Shock Rock" },
+                { name: "Slapback", power: "Rebote" },
+                { name: "Ventrilosquid", power: "Ventrílocuo" },
+                { name: "Portaler", power: "Portaler" },
+                { name: "Snakepit", power: "Pozo de Serpientes" },
+                { name: "Shellhead", power: "Cabeza de Concha" },
+                { name: "Barrigobot", power: "Barrigobot" },
+                { name: "Skidmarx", power: "Derrape" },
+                { name: "To'kustar", power: "To'kustar" }
+            ];
+            
+            // Función para verificar si una imagen existe
+            function imageExists(imageSrc, callback) {
+                const img = new Image();
+                img.onload = function() { callback(true); };
+                img.onerror = function() { callback(false); };
+                img.src = imageSrc;
+            }
+            
+            // Crear contenedores para cada alien
+            for (let i = 0; i < 69; i++) {
+                const container = document.createElement('div');
+                container.className = 'image-container';
+                container.dataset.index = i + 1; // Guardar índice para acceso fácil
                 
-                // Marcar números comprados
-                if (purchasedNumbers.has(i)) {
-                    number.classList.add('purchased');
-                }
+                const img = document.createElement('img');
+                const imgIndex = i + 1;
+                const imageSrc = `imga_${imgIndex}.jpg`; // Nombre de archivo según el requerimiento
                 
-                // Agregar evento de clic
-                number.addEventListener('click', function() {
-                    if (number.classList.contains('purchased')) {
-                        purchasedNumbers.delete(i);
+                // Configurar fuente de imagen
+                img.dataset.index = imgIndex;
+                
+                // Intentar cargar la imagen secuencial
+                imageExists(imageSrc, function(exists) {
+                    if (exists) {
+                        img.src = imageSrc;
                     } else {
-                        purchasedNumbers.add(i);
+                        // Si no existe, usar placeholder
+                        img.src = `/api/placeholder/200/150?text=${imgIndex}`;
                     }
-                    number.classList.toggle('purchased');
-                    saveNumbers(purchasedNumbers);
                 });
                 
-                grid.appendChild(number);
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'image-name';
+                
+                // Usar nombres de la lista o generar nombres genéricos
+                if (i < alienList.length) {
+                    img.alt = alienList[i].name;
+                    nameDiv.innerHTML = `<strong>${alienList[i].name}</strong>`;
+                    
+                    // Añadir poder como subtítulo
+                    const powerSpan = document.createElement('div');
+                    powerSpan.className = 'alien-power';
+                    powerSpan.textContent = alienList[i].power;
+                    nameDiv.appendChild(powerSpan);
+                } else {
+                    img.alt = `Alien ${imgIndex}`;
+                    nameDiv.textContent = `Alien ${imgIndex}`;
+                }
+                
+                container.appendChild(img);
+                container.appendChild(nameDiv);
+                
+                // Agregar evento de clic
+                container.addEventListener('click', function() {
+                    toggleSelection(this);
+                });
+                
+                gallery.appendChild(container);
+                containers.push(container); // Guardar referencia
             }
-        }
-
-        // Inicializar la cuadrícula
-        updateGrid();
-
-        // Configurar el botón de marcar
-        const markButton = document.getElementById('markButton');
-        const numberInput = document.getElementById('numberInput');
-
-        //numeros apartados
-        purchasedNumbers.add(75);//1
-        purchasedNumbers.add(29);//2
-        purchasedNumbers.add(7);//3
-        purchasedNumbers.add(35);//4 yo pagado
-        purchasedNumbers.add(18);//5
-        purchasedNumbers.add(39);//6
-        purchasedNumbers.add(26);//7
-        purchasedNumbers.add(27);//8
-        purchasedNumbers.add(53);//9 p omaira
-        purchasedNumbers.add(11);//10
-        purchasedNumbers.add(49);//11
-        purchasedNumbers.add(44);//12
-        purchasedNumbers.add(23);//13
-        purchasedNumbers.add(01);//14 p mady
-        purchasedNumbers.add(03);//15 f mady
-        purchasedNumbers.add(77);//16
-        purchasedNumbers.add(42);//17
-        purchasedNumbers.add(8);//18
-        purchasedNumbers.add(19);//19 p marizela
-        purchasedNumbers.add(28);//20 p marizela
-        purchasedNumbers.add(24);//21 p tio emiro
-        purchasedNumbers.add(9);//22
-        purchasedNumbers.add(46);//23
-        purchasedNumbers.add(2);//24
-        purchasedNumbers.add(20);//25
-        purchasedNumbers.add(67);//26
-        purchasedNumbers.add(21);//27
-        purchasedNumbers.add(12);//28 p humber
-        purchasedNumbers.add(16);//29 p humber
-        purchasedNumbers.add(98);//30 p humber
-        purchasedNumbers.add(74);//31 p humber
-        purchasedNumbers.add(56);//32
-        purchasedNumbers.add(84);//33
-        purchasedNumbers.add(22);//34
-        purchasedNumbers.add(05);//35
-        purchasedNumbers.add(62);//36
-        purchasedNumbers.add(70);//37
-        purchasedNumbers.add(71);//38
-        purchasedNumbers.add(15);//39
-        purchasedNumbers.add(50);//40
-        purchasedNumbers.add(83);//41
-        purchasedNumbers.add(17);//42
-        purchasedNumbers.add(04);//43
-        purchasedNumbers.add(37);//44
-        purchasedNumbers.add(36);//45
-        purchasedNumbers.add(88);//46
-        purchasedNumbers.add(10);//47
-        purchasedNumbers.add(79);//48
-        purchasedNumbers.add(00);//49
-        purchasedNumbers.add(86);//50
-        purchasedNumbers.add(30);//51
-        purchasedNumbers.add(31);//52
-        purchasedNumbers.add(92);//53
-        purchasedNumbers.add(59);//54
-        purchasedNumbers.add(28);//55
-        purchasedNumbers.add(51);//56
-        purchasedNumbers.add(78);//57
-        purchasedNumbers.add(33);//58
-        purchasedNumbers.add(38);//59
-        purchasedNumbers.add(82);//60 p mom jeff
-        purchasedNumbers.add(13);//61
-        purchasedNumbers.add(14);//62
-        purchasedNumbers.add(34);//63
-        purchasedNumbers.add(06);//64
-        purchasedNumbers.add(76);//65
-        purchasedNumbers.add(54);//66
-        purchasedNumbers.add(52);//67
-        purchasedNumbers.add(72);//68 p
-        purchasedNumbers.add(45);//69
-        purchasedNumbers.add(95);//70 fransisco lozano
-        purchasedNumbers.add(55);//71
-        purchasedNumbers.add(69);//72
-        purchasedNumbers.add(96);//73
-        purchasedNumbers.add(61);//74
-        purchasedNumbers.add(85);//75
-        purchasedNumbers.add(40);//76
-        purchasedNumbers.add(41);//77
-        purchasedNumbers.add(57);//78
-        purchasedNumbers.add(58);//79
-        purchasedNumbers.add(65);//80
-        purchasedNumbers.add(64);//81
-        purchasedNumbers.add(32);//82
-        purchasedNumbers.add(93);//83
-        purchasedNumbers.add(73);//84
-        purchasedNumbers.add(43);//85
-        purchasedNumbers.add(66);//86
-        
-        // total pagadp 440.000
-        saveNumbers(purchasedNumbers);
-        updateGrid();
-
+            
+            // Función para activar/desactivar selección
+            function toggleSelection(container) {
+                const wasSelected = container.classList.contains('selected');
+                container.classList.toggle('selected');
+                
+                // Actualizar contador
+                if (wasSelected) {
+                    selectedCount--;
+                } else {
+                    selectedCount++;
+                }
+                foundCounter.textContent = selectedCount;
+            }
+            
+            // Función para marcar un rango de aliens
+            function markRange(start, end) {
+                // Ajustar índices (restar 1 porque los arrays empiezan en 0)
+                const startIndex = start - 1;
+                const endIndex = end - 1;
+                
+                // Desmarcar todos primero para evitar duplicados
+                containers.forEach(container => {
+                    if (container.classList.contains('selected')) {
+                        toggleSelection(container);
+                    }
+                });
+                
+                // Marcar el rango específico
+                for (let i = startIndex; i <= endIndex; i++) {
+                    if (i < containers.length && !containers[i].classList.contains('selected')) {
+                        toggleSelection(containers[i]);
+                    }
+                }
+            }
+            
+            // Configurar eventos de botones de temporada
+            document.getElementById('season1').addEventListener('click', function() {
+                markRange(1, 21); // Primera temporada: aliens 1-21
+            });
+            
+            document.getElementById('season2').addEventListener('click', function() {
+                markRange(22, 34); // Segunda temporada: aliens 22-34
+            });
+            
+            document.getElementById('season3').addEventListener('click', function() {
+                markRange(35, 50); // Tercera temporada: aliens 35-50
+            });
+            
+            document.getElementById('season4').addEventListener('click', function() {
+                markRange(51, 69); // Cuarta temporada: aliens 51-69
+            });
+            
+            // Botón para limpiar todas las selecciones
+            document.getElementById('reset').addEventListener('click', function() {
+                containers.forEach(container => {
+                    if (container.classList.contains('selected')) {
+                        toggleSelection(container);
+                    }
+                });
+            });
+            
+            // Actualizar el contador total
+            totalCounter.textContent = containers.length;
+        });
     </script>
 </body>
 </html>
